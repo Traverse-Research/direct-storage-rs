@@ -1,6 +1,6 @@
 mod DStorage;
 use std::mem::ManuallyDrop;
-use windows::Win32::Foundation::{FALSE, TRUE};
+use windows::Win32::Foundation::FALSE;
 use windows::Win32::Graphics::Direct3D::D3D_FEATURE_LEVEL_12_1;
 use windows::Win32::Graphics::Direct3D12::D3D12CreateDevice;
 use windows::Win32::Graphics::Direct3D12::ID3D12Device;
@@ -9,13 +9,12 @@ use windows::Win32::Graphics::Dxgi::Common::*;
 use windows::Win32::Storage::FileSystem::BY_HANDLE_FILE_INFORMATION;
 use windows::Win32::System::Threading::{CreateEventA, WaitForSingleObject, INFINITE};
 use windows_core::w;
-use windows_core::{IUnknown, Interface};
 use DStorage::Direct3D::DirectStorage::*;
 use DStorage::Direct3D::DirectStorage::{IDStorageFactory, IDStorageFile};
 
 fn main() {
     let mut device: Option<ID3D12Device> = None;
-    unsafe { D3D12CreateDevice(None, D3D_FEATURE_LEVEL_12_1, &mut device) };
+    unsafe { D3D12CreateDevice(None, D3D_FEATURE_LEVEL_12_1, &mut device) }.unwrap();
     let device = ManuallyDrop::new(device);
 
     let factory = unsafe { DStorageGetFactory::<IDStorageFactory>() }.unwrap();
@@ -23,9 +22,9 @@ fn main() {
     let file: IDStorageFile = unsafe { factory.OpenFile(w!("./bindings.txt")) }.unwrap();
     let mut info = BY_HANDLE_FILE_INFORMATION::default();
     unsafe { file.GetFileInformation(&mut info) }.unwrap();
-    let fileSize = info.nFileSizeLow;
+    let file_size = info.nFileSizeLow;
 
-    let queueDesc = DSTORAGE_QUEUE_DESC {
+    let queue_desc = DSTORAGE_QUEUE_DESC {
         Capacity: DSTORAGE_MAX_QUEUE_CAPACITY as u16,
         Priority: DSTORAGE_PRIORITY_NORMAL,
         SourceType: DSTORAGE_REQUEST_SOURCE_FILE,
@@ -33,16 +32,16 @@ fn main() {
         ..Default::default()
     };
 
-    let queue: IDStorageQueue = unsafe { factory.CreateQueue(&queueDesc).unwrap() };
+    let queue: IDStorageQueue = unsafe { factory.CreateQueue(&queue_desc).unwrap() };
 
-    let bufferHeapProps = D3D12_HEAP_PROPERTIES {
+    let buffer_heap_props = D3D12_HEAP_PROPERTIES {
         Type: D3D12_HEAP_TYPE_DEFAULT,
         ..Default::default()
     };
 
-    let bufferDesc = D3D12_RESOURCE_DESC {
+    let buffer_desc = D3D12_RESOURCE_DESC {
         Dimension: D3D12_RESOURCE_DIMENSION_BUFFER,
-        Width: fileSize as u64,
+        Width: file_size as u64,
         Height: 1,
         DepthOrArraySize: 1,
         MipLevels: 1,
@@ -55,18 +54,18 @@ fn main() {
         ..Default::default()
     };
 
-    let mut bufferResource: Option<ID3D12Resource> = None;
+    let mut buffer_resource: Option<ID3D12Resource> = None;
     unsafe {
         device
             .as_ref()
             .unwrap()
             .CreateCommittedResource(
-                &bufferHeapProps,
+                &buffer_heap_props,
                 D3D12_HEAP_FLAG_NONE,
-                &bufferDesc,
+                &buffer_desc,
                 D3D12_RESOURCE_STATE_COMMON,
                 None,
-                &mut bufferResource,
+                &mut buffer_resource,
             )
             .unwrap()
     };
@@ -82,15 +81,15 @@ fn main() {
             File: ManuallyDrop::new(DSTORAGE_SOURCE_FILE {
                 Source: ManuallyDrop::new(Some(file.clone())),
                 Offset: 0,
-                Size: fileSize,
+                Size: file_size,
             }),
         },
-        UncompressedSize: fileSize,
+        UncompressedSize: file_size,
         Destination: DSTORAGE_DESTINATION {
             Buffer: ManuallyDrop::new(DSTORAGE_DESTINATION_BUFFER {
-                Resource: ManuallyDrop::new(bufferResource.clone()),
+                Resource: ManuallyDrop::new(buffer_resource.clone()),
                 Offset: 0,
-                Size: fileSize,
+                Size: file_size,
             }),
         },
         ..Default::default()
@@ -106,19 +105,19 @@ fn main() {
     }
     .unwrap();
 
-    let fenceEvent = unsafe { CreateEventA(None, FALSE, FALSE, None) }.unwrap();
-    let fenceValue = 1;
-    unsafe { fence.SetEventOnCompletion(fenceValue, fenceEvent) };
-    unsafe { queue.EnqueueSignal(&fence, fenceValue) };
+    let fence_event = unsafe { CreateEventA(None, FALSE, FALSE, None) }.unwrap();
+    let fence_value = 1;
+    unsafe { fence.SetEventOnCompletion(fence_value, fence_event) }.unwrap();
+    unsafe { queue.EnqueueSignal(&fence, fence_value) };
 
     unsafe { queue.Submit() };
 
     println!("Waiting for the DirectStorage request to complete...");
-    unsafe { WaitForSingleObject(fenceEvent, INFINITE) };
+    unsafe { WaitForSingleObject(fence_event, INFINITE) };
 
-    let mut errorRecord = DSTORAGE_ERROR_RECORD::default();
-    unsafe { queue.RetrieveErrorRecord(&mut errorRecord) };
+    let mut error_record = DSTORAGE_ERROR_RECORD::default();
+    unsafe { queue.RetrieveErrorRecord(&mut error_record) };
 
-    dbg!(errorRecord.FailureCount);
-    dbg!(errorRecord.FirstFailure.HResult);
+    println!("{:?}", error_record.FailureCount);
+    println!("{:?}", error_record.FirstFailure.HResult);
 }
