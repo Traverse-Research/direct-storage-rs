@@ -1,4 +1,4 @@
---in .windows/winmd/
+--in vendor/dstorage-1.2.1/winmd/
 --out src/DStorage.rs
 
 
