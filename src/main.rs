@@ -1,5 +1,7 @@
 mod DStorage;
+use DStorage::Direct3D::DirectStorage::DStorageGetFactory;
+use DStorage::Direct3D::DirectStorage::IDStorageFactory;
 
 fn main() {
-    println!("Hello, world!");
+    let factory = unsafe { DStorageGetFactory::<IDStorageFactory>() };
 }
