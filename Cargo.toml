@@ -1,0 +1,22 @@
+[package]
+name = "direct-storage-rs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1"
+libloading = "0.8"
+windows-core = "0.51"
+
+[dependencies.windows]
+version = "0.51"
+features = [
+    "implement",
+    "Win32_Foundation",
+    "Win32_Graphics_Direct3D12",
+    "Win32_Graphics_Dxgi_Common",
+    "Win32_Storage_FileSystem",
+]
+
+[workspace]
+members = ["api-gen"]

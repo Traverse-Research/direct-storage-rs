@@ -1,0 +1,6 @@
+--in .windows/winmd/
+--out src/DStorage.rs
+
+
+--filter
+    Microsoft
