@@ -1,12 +1,12 @@
 [package]
-name = "direct-storage-rs"
+name = "custom-example"
 version = "0.1.0"
 edition = "2021"
 
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
 [dependencies]
-anyhow = "1"
-libloading = "0.8"
-windows-core = "0.52"
+direct-storage-rs = { path = "../" }
 
 [dependencies.windows]
 version = "0.52"
@@ -21,6 +21,3 @@ features = [
     "Win32_Storage_FileSystem",
     "Win32_Security",
 ]
-
-[workspace]
-members = ["api-gen", "custom-example"]

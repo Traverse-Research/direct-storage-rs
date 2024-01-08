@@ -4,4 +4,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-windows-bindgen = "0.51"
+windows-bindgen = "0.52"
