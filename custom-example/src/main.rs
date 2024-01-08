@@ -1,4 +1,7 @@
+use direct_storage_rs::Direct3D::DirectStorage::*;
+use direct_storage_rs::Direct3D::DirectStorage::{IDStorageFactory, IDStorageFile};
 use std::mem::ManuallyDrop;
+use windows::core::w;
 use windows::Win32::Foundation::FALSE;
 use windows::Win32::Graphics::Direct3D::D3D_FEATURE_LEVEL_12_1;
 use windows::Win32::Graphics::Direct3D12::D3D12CreateDevice;
@@ -7,9 +10,6 @@ use windows::Win32::Graphics::Direct3D12::*;
 use windows::Win32::Graphics::Dxgi::Common::*;
 use windows::Win32::Storage::FileSystem::BY_HANDLE_FILE_INFORMATION;
 use windows::Win32::System::Threading::{CreateEventA, WaitForSingleObject, INFINITE};
-use windows::core::w;
-use direct_storage_rs::Direct3D::DirectStorage::*;
-use direct_storage_rs::Direct3D::DirectStorage::{IDStorageFactory, IDStorageFile};
 
 fn main() {
     let mut device: Option<ID3D12Device> = None;

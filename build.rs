@@ -9,7 +9,11 @@ fn main() {
 
     #[cfg(target_arch = "x86")]
     {
-        println!("cargo:rustc-link-search=./vendor/dstorage-1.2.1/lib/x86");
+        println!(concat!(
+            "cargo:rustc-link-search=",
+            env!("CARGO_MANIFEST_DIR"),
+            "/vendor/dstorage-1.2.1/lib/x86"
+        ));
         std::fs::copy(
             "./vendor/dstorage-1.2.1/bin/x86/dstorage.dll",
             target_dstorage,
@@ -24,7 +28,11 @@ fn main() {
 
     #[cfg(target_arch = "x86_64")]
     {
-        println!("cargo:rustc-link-search=./vendor/dstorage-1.2.1/lib/x64");
+        println!(concat!(
+            "cargo:rustc-link-search=",
+            env!("CARGO_MANIFEST_DIR"),
+            "/vendor/dstorage-1.2.1/lib/x64"
+        ));
         std::fs::copy(
             "./vendor/dstorage-1.2.1/bin/x64/dstorage.dll",
             target_dstorage,
@@ -39,7 +47,11 @@ fn main() {
 
     #[cfg(target_arch = "arm")]
     {
-        println!("cargo:rustc-link-search=./vendor/dstorage-1.2.1/lib/ARM");
+        println!(concat!(
+            "cargo:rustc-link-search=",
+            env!("CARGO_MANIFEST_DIR"),
+            "/vendor/dstorage-1.2.1/lib/ARM"
+        ));
         std::fs::copy(
             "./vendor/dstorage-1.2.1/bin/ARM/dstorage.dll",
             target_dstorage,
@@ -54,7 +66,11 @@ fn main() {
 
     #[cfg(target_arch = "aarch64")]
     {
-        println!("cargo:rustc-link-search=./vendor/dstorage-1.2.1/lib/ARM64");
+        println!(concat!(
+            "cargo:rustc-link-search=",
+            env!("CARGO_MANIFEST_DIR"),
+            "/vendor/dstorage-1.2.1/lib/ARM64"
+        ));
         std::fs::copy(
             "./vendor/dstorage-1.2.1/bin/ARM64/dstorage.dll",
             target_dstorage,
